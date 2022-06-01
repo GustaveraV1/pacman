@@ -1,5 +1,6 @@
 CC=g++
-CFLAGS=-Wall -Wextra -pedantic -g -fPIC -fprofile-arcs -ftest-coverage
+CFLAGS=-Wall -Wextra -pedantic -g
+CFALLEGRO=-lallegro-5 -lallegro_font-5 -lallegro_image-5
 
 OBJ=obj
 BIN=bin
@@ -21,16 +22,16 @@ TSTO=$(patsubst $(TST)/%_test.cpp, $(TSO)/%.o, $(TSTS))
 all: $(BIN) $(OBJ) $(PNAME)
 
 $(PNAME): $(OBJS) main.cpp
-	$(CC) $(CFLAGS) $^ -o $(BIN)/$@
+	$(CC) $(CFLAGS) $^ -o $(BIN)/$@ $(CFALLEGRO)
 
 $(OBJ)/%.o: $(SRC)/%.cpp
-	$(CC) $(CFLAGS) -I $(HDR) -c $< -o $@
+	$(CC) $(CFLAGS) -I $(HDR) -c $< -o $@ $(CFALLEGRO)
 
 $(BIN):
-	mkdir -p $@
+	mkdir $@
 
 $(OBJ):
-	mkdir -p $@
+	mkdir $@
 
 test: $(TSB) $(OBJ)
 
@@ -44,19 +45,10 @@ $(TSO)/%.o: $(TST)/%_test.cpp
 	$(CC) $(CFLAGS) -I $(HDR) -c $^ -o $@ -lgtest -pthread
 
 $(TSB):
-	mkdir -p $@
+	mkdir $@
 
 $(TSO):
-	mkdir -p $@
-
-gcov:
-	gcov $(SRCS) main.cpp
-
-coverage.info: gcov
-	lcov --capture --directory . --output-file coverage.info
-
-report: coverage.info
-	genhtml coverage.info --output-directory out
+	mkdir $@
 
 clean:
-	rm -rf $(OBJ) $(BIN) $(TSB) $(TSO) out *.gcno *.gcov coverage.info
+	rm -rf $(OBJ) $(BIN) $(TSB) $(TSO) out
